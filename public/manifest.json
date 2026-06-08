@@ -1,0 +1,26 @@
+{
+  "name": "Lavô! Manager",
+  "short_name": "Lavô!",
+  "description": "Seu estofado novo de novo.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1d3a",
+  "theme_color": "#0f1d3a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "https://upptcyqsfjlproclqemt.supabase.co/storage/v1/object/public/LOGO%20SISTEM/logo-LAVO.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://upptcyqsfjlproclqemt.supabase.co/storage/v1/object/public/LOGO%20SISTEM/logo-LAVO.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
