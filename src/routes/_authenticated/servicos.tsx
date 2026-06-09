@@ -35,15 +35,13 @@ import {
   labelTipo,
   statusInfo,
 } from "@/lib/lavo/tipos";
-import { fullAddressFromCep, distanciaPorRota, distanciaPorRotaOpenRoute } from "@/lib/lavo/geo";
+import { fullAddressFromCep, distanciaPorRotaOpenRoute } from "@/lib/lavo/geo";
 import {
   brl,
   calcCombustivel,
   calcDisponivel,
   calcReservas,
-  corrigirDistancia,
   formatCep,
-  haversineKm,
 } from "@/lib/lavo/calc";
 
 export const Route = createFileRoute("/_authenticated/servicos")({
@@ -203,28 +201,12 @@ function ServicoDialog({ initial, onClose }: { initial: any; onClose: () => void
       console.log("[ROTA] Coordenadas sede:", sedeLat, sedeLng);
       console.log("[ROTA] Coordenadas destino:", destLat, destLng);
 
-      let dist: number;
-      if (config.api_rotas) {
-        const distOrs = await distanciaPorRotaOpenRoute(config.api_rotas, sedeLat, sedeLng, destLat, destLng);
-        console.log("[ROTA] OpenRouteService:", distOrs);
-        if (distOrs != null) {
-          dist = distOrs;
-        } else {
-          console.warn("[ROTA] OpenRouteService falhou, tentando OSRM...");
-          const distOsm = await distanciaPorRota(sedeLat, sedeLng, destLat, destLng);
-          console.log("[ROTA] OSRM fallback:", distOsm);
-          dist = distOsm ?? haversineKm(sedeLat, sedeLng, destLat, destLng);
-          if (!distOsm) console.warn("[ROTA] OSRM também falhou, fallback Haversine:", dist);
-        }
-      } else {
-        const distOsm = await distanciaPorRota(sedeLat, sedeLng, destLat, destLng);
-        console.log("[ROTA] OSRM (sem api_rotas):", distOsm);
-        dist = distOsm ?? haversineKm(sedeLat, sedeLng, destLat, destLng);
-        if (!distOsm) console.warn("[ROTA] OSRM falhou, fallback Haversine:", dist);
+      if (!config.api_rotas) {
+        throw new Error("Configure a chave da API de Rotas em Configurações");
       }
 
-      dist = corrigirDistancia(dist);
-      console.log("[ROTA] Distância corrigida:", dist);
+      const dist = await distanciaPorRotaOpenRoute(config.api_rotas, sedeLat, sedeLng, destLat, destLng);
+      if (dist == null) throw new Error("Falha ao calcular rota. Verifique o CEP e tente novamente.");
 
       const c = calcCombustivel(dist, Number(config.consumo_medio_veiculo), Number(config.preco_combustivel));
       setForm((f) => ({
